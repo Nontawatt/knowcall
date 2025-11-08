@@ -1,0 +1,13 @@
+{
+  "name": "knowcall-shared",
+  "version": "0.1.0",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

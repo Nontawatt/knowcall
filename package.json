@@ -1,0 +1,29 @@
+{
+  "name": "knowcall",
+  "version": "0.1.0",
+  "description": "แอปพลิเคชันป้องกันการโทรหลอกลวงและสแปมสำหรับผู้ใช้ไทย",
+  "private": true,
+  "workspaces": [
+    "mobile",
+    "backend",
+    "shared"
+  ],
+  "scripts": {
+    "mobile": "cd mobile && npm start",
+    "backend": "cd backend && npm run dev",
+    "dev": "concurrently \"npm run backend\" \"npm run mobile\"",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces"
+  },
+  "keywords": [
+    "spam-blocker",
+    "call-blocker",
+    "fraud-prevention",
+    "thailand"
+  ],
+  "author": "Nontawatt",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
