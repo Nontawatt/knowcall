@@ -89,7 +89,81 @@ knowcall/
 ├── docs/            # Documentation
 └── README.md
 ```
+### โครงสร้างระบบ (System Components)
 
+```mermaid
+graph LR
+    subgraph "Frontend"
+        A[Home Screen] --> G[Redux Store]
+        B[Call Logs] --> G
+        C[Block Lists] --> G
+        D[Settings] --> G
+        G --> H[API Service]
+    end
+
+    subgraph "Backend"
+        H --> I[Phone Routes]
+        H --> J[User Routes]
+        H --> K[Report Routes]
+
+        I --> L[Phone Controller]
+        J --> M[User Controller]
+        K --> N[Report Controller]
+
+        L --> O[Verification Service]
+        M --> O
+        N --> O
+    end
+
+    subgraph "Storage"
+        O --> P[(PostgreSQL)]
+        O --> Q[(Redis)]
+    end
+
+    style A fill:#E3F2FD
+    style B fill:#E3F2FD
+    style C fill:#E3F2FD
+    style D fill:#E3F2FD
+    style O fill:#FFF3E0
+    style P fill:#E8F5E9
+    style Q fill:#FFEBEE
+```
+
+### การทำงานของระบบบล็อกสาย (Call Blocking Flow)
+
+```mermaid
+flowchart TD
+    Start([📞 สายเข้า]) --> Check{ตรวจสอบ<br/>Whitelist}
+
+    Check -->|ใน Whitelist| Allow[✅ อนุญาต]
+    Check -->|ไม่ใช่| CheckBlack{ตรวจสอบ<br/>Blacklist}
+
+    CheckBlack -->|ใน Blacklist| Block[❌ บล็อก]
+    CheckBlack -->|ไม่ใช่| Verify{ตรวจสอบ<br/>Risk Level}
+
+    Verify -->|🟢 Low| Allow
+    Verify -->|🟡 Medium| CheckSetting{ตั้งค่า<br/>Auto-Mute?}
+    Verify -->|🔴 High/Critical| Block
+
+    CheckSetting -->|เปิด| Mute[🔇 ปิดเสียง]
+    CheckSetting -->|ปิด| Allow
+
+    Allow --> Log1[บันทึก Call Log]
+    Block --> Log2[บันทึก Call Log]
+    Mute --> Log3[บันทึก Call Log]
+
+    Log1 --> End([จบ])
+    Log2 --> End
+    Log3 --> End
+
+    style Start fill:#4CAF50
+    style Allow fill:#8BC34A
+    style Block fill:#F44336
+    style Mute fill:#FF9800
+    style End fill:#2196F3
+```
+
+📖 **รายละเอียดเพิ่มเติม**: ดู [Architecture Guide](docs/ARCHITECTURE.md)
 ## การพัฒนา (Development)
 
 โปรเจคนี้อยู่ในระหว่างการพัฒนา (Prototype Stage)
