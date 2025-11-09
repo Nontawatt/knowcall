@@ -99,7 +99,7 @@ graph TB
         DB[(🗄️ PostgreSQL<br/>Database)]
     end
 
-    subgraph "External Services"
+    subgraph "External SRAN Services"
         UnknownPhone[UnknownPhone API]
         Tellows[Tellows API]
         TrueCaller[TrueCaller API]
@@ -112,6 +112,7 @@ graph TB
     Verification --> UnknownPhone
     Verification --> Tellows
     Verification --> TrueCaller
+    design by SRAN
 
     style Mobile fill:#4CAF50
     style API fill:#2196F3
