@@ -61,6 +61,171 @@ KnowCall เป็นแอปพลิเคชันป้องกันแ�
 - Tellows API
 - TrueCaller API (optional)
 
+## 🏗️ System Architecture
+
+### ภาพรวมสถาปัตยกรรม (Architecture Overview)
+
+```mermaid
+graph TB
+    subgraph "Mobile App Layer"
+        Mobile[📱 React Native App<br/>TypeScript]
+        Redux[Redux Store]
+        UI[React Native Paper UI]
+
+        Mobile --> Redux
+        Mobile --> UI
+    end
+
+    subgraph "API Layer"
+        API[🔌 REST API<br/>Express.js]
+        Auth[Authentication]
+        RateLimit[Rate Limiter]
+
+        API --> Auth
+        API --> RateLimit
+    end
+
+    subgraph "Business Logic Layer"
+        Controller[Controllers]
+        Service[Services]
+        Verification[📞 Number Verification<br/>Service]
+
+        Controller --> Service
+        Service --> Verification
+    end
+
+    subgraph "Data Layer"
+        Cache[(🗄️ Redis<br/>Cache)]
+        DB[(🗄️ PostgreSQL<br/>Database)]
+    end
+
+    subgraph "External Services"
+        UnknownPhone[UnknownPhone API]
+        Tellows[Tellows API]
+        TrueCaller[TrueCaller API]
+    end
+
+    Mobile -->|HTTPS/REST| API
+    Controller --> Cache
+    Controller --> DB
+    Verification --> Cache
+    Verification --> UnknownPhone
+    Verification --> Tellows
+    Verification --> TrueCaller
+
+    style Mobile fill:#4CAF50
+    style API fill:#2196F3
+    style DB fill:#FF9800
+    style Cache fill:#F44336
+    style Verification fill:#9C27B0
+```
+
+### การไหลของข้อมูล (Data Flow)
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant App as 📱 Mobile App
+    participant API as 🔌 Backend API
+    participant Cache as Redis Cache
+    participant DB as PostgreSQL
+    participant Ext as External APIs
+
+    User->>App: ตรวจสอบหมายเลข
+    App->>API: POST /api/phones/verify
+
+    API->>Cache: ตรวจสอบ Cache
+
+    alt Cache Hit
+        Cache-->>API: ส่งข้อมูลจาก Cache
+    else Cache Miss
+        API->>DB: ค้นหาในฐานข้อมูล
+        API->>Ext: ตรวจสอบจาก External APIs
+        Ext-->>API: ผลการตรวจสอบ
+        API->>Cache: บันทึก Cache
+        API->>DB: บันทึกผลลัพธ์
+    end
+
+    API-->>App: ส่งผลการตรวจสอบ
+    App-->>User: แสดงผล Risk Level
+```
+
+### โครงสร้างระบบ (System Components)
+
+```mermaid
+graph LR
+    subgraph "Frontend"
+        A[Home Screen] --> G[Redux Store]
+        B[Call Logs] --> G
+        C[Block Lists] --> G
+        D[Settings] --> G
+        G --> H[API Service]
+    end
+
+    subgraph "Backend"
+        H --> I[Phone Routes]
+        H --> J[User Routes]
+        H --> K[Report Routes]
+
+        I --> L[Phone Controller]
+        J --> M[User Controller]
+        K --> N[Report Controller]
+
+        L --> O[Verification Service]
+        M --> O
+        N --> O
+    end
+
+    subgraph "Storage"
+        O --> P[(PostgreSQL)]
+        O --> Q[(Redis)]
+    end
+
+    style A fill:#E3F2FD
+    style B fill:#E3F2FD
+    style C fill:#E3F2FD
+    style D fill:#E3F2FD
+    style O fill:#FFF3E0
+    style P fill:#E8F5E9
+    style Q fill:#FFEBEE
+```
+
+### การทำงานของระบบบล็อกสาย (Call Blocking Flow)
+
+```mermaid
+flowchart TD
+    Start([📞 สายเข้า]) --> Check{ตรวจสอบ<br/>Whitelist}
+
+    Check -->|ใน Whitelist| Allow[✅ อนุญาต]
+    Check -->|ไม่ใช่| CheckBlack{ตรวจสอบ<br/>Blacklist}
+
+    CheckBlack -->|ใน Blacklist| Block[❌ บล็อก]
+    CheckBlack -->|ไม่ใช่| Verify{ตรวจสอบ<br/>Risk Level}
+
+    Verify -->|🟢 Low| Allow
+    Verify -->|🟡 Medium| CheckSetting{ตั้งค่า<br/>Auto-Mute?}
+    Verify -->|🔴 High/Critical| Block
+
+    CheckSetting -->|เปิด| Mute[🔇 ปิดเสียง]
+    CheckSetting -->|ปิด| Allow
+
+    Allow --> Log1[บันทึก Call Log]
+    Block --> Log2[บันทึก Call Log]
+    Mute --> Log3[บันทึก Call Log]
+
+    Log1 --> End([จบ])
+    Log2 --> End
+    Log3 --> End
+
+    style Start fill:#4CAF50
+    style Allow fill:#8BC34A
+    style Block fill:#F44336
+    style Mute fill:#FF9800
+    style End fill:#2196F3
+```
+
+📖 **รายละเอียดเพิ่มเติม**: ดู [Architecture Guide](docs/ARCHITECTURE.md)
+
 ## การติดตั้งและใช้งาน (Installation)
 
 ### ความต้องการระบบ
