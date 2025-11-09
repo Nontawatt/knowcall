@@ -7,14 +7,14 @@
 
 ## 📚 เอกสาร (Documentation)
 
-- 📖 **[Wiki](https://github.com/Nontawatt/knowcall/wiki)** - คู่มือการใช้งานแบบละเอียด
-- 🚀 **[Getting Started](docs/wiki/Getting-Started.md)** - เริ่มต้นใช้งาน
-- 📞 **[Phone Verification](docs/wiki/Phone-Verification.md)** - วิธีตรวจสอบหมายเลข
-- ❓ **[FAQ](docs/wiki/FAQ.md)** - คำถามที่พบบ่อย
-- 🛡️ **[Safety Tips](docs/wiki/Safety-Tips.md)** - เคล็ดลับความปลอดภัย
-- 🔧 **[API Documentation](docs/API.md)** - เอกสาร API
-- 🏗️ **[Architecture](docs/ARCHITECTURE.md)** - สถาปัตยกรรมระบบ
-- 📦 **[Setup Guide](docs/SETUP.md)** - คู่มือการติดตั้ง
+- **[Wiki](https://github.com/Nontawatt/knowcall/wiki)** - คู่มือการใช้งานแบบละเอียด
+- **[Getting Started](docs/wiki/Getting-Started.md)** - เริ่มต้นใช้งาน
+- **[Phone Verification](docs/wiki/Phone-Verification.md)** - วิธีตรวจสอบหมายเลข
+- **[FAQ](docs/wiki/FAQ.md)** - คำถามที่พบบ่อย
+- **[Safety Tips](docs/wiki/Safety-Tips.md)** - เคล็ดลับความปลอดภัย
+- **[API Documentation](docs/API.md)** - เอกสาร API
+- **[Architecture](docs/ARCHITECTURE.md)** - สถาปัตยกรรมระบบ
+- **[Setup Guide](docs/SETUP.md)** - คู่มือการติดตั้ง
 
 ## แนวคิด (Concept)
 
