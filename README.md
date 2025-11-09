@@ -99,7 +99,7 @@ graph TB
         DB[(🗄️ PostgreSQL<br/>Database)]
     end
 
-    subgraph "External SRAN Services"
+    subgraph "External Services"
         UnknownPhone[UnknownPhone API]
         Tellows[Tellows API]
         TrueCaller[TrueCaller API]
@@ -110,7 +110,7 @@ graph TB
     Controller --> DB
     Verification --> Cache
     Verification --> UnknownPhone
-    Verification --> Tellows / SRAN
+    Verification --> Tellows
     Verification --> TrueCaller
     
 
