@@ -5,6 +5,17 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Status: Prototype](https://img.shields.io/badge/Status-Prototype-orange.svg)]()
 
+## 📚 เอกสาร (Documentation)
+
+- 📖 **[Wiki](https://github.com/Nontawatt/knowcall/wiki)** - คู่มือการใช้งานแบบละเอียด
+- 🚀 **[Getting Started](docs/wiki/Getting-Started.md)** - เริ่มต้นใช้งาน
+- 📞 **[Phone Verification](docs/wiki/Phone-Verification.md)** - วิธีตรวจสอบหมายเลข
+- ❓ **[FAQ](docs/wiki/FAQ.md)** - คำถามที่พบบ่อย
+- 🛡️ **[Safety Tips](docs/wiki/Safety-Tips.md)** - เคล็ดลับความปลอดภัย
+- 🔧 **[API Documentation](docs/API.md)** - เอกสาร API
+- 🏗️ **[Architecture](docs/ARCHITECTURE.md)** - สถาปัตยกรรมระบบ
+- 📦 **[Setup Guide](docs/SETUP.md)** - คู่มือการติดตั้ง
+
 ## แนวคิด (Concept)
 
 KnowCall เป็นแอปพลิเคชันป้องกันและแจ้งเตือนสายโทรศัพท์ พอร์ทโทรศัพท์ หรือข้อความที่เป็นมิจฉาชีพและสแปมสำหรับผู้ใช้ในประเทศไทย โดยเน้นความปลอดภัยและความเป็นส่วนตัวของผู้ใช้ แอปนี้จะมีฐานข้อมูลเลขโทรศัพท์และโดเมนที่น่าสงสัยที่อัปเดตโดยชุมชนและหน่วยงานที่เกี่ยวข้อง เพื่อความแม่นยำที่มากยิ่งขึ้น
@@ -50,45 +61,95 @@ KnowCall เป็นแอปพลิเคชันป้องกันแ�
 - Tellows API
 - TrueCaller API (optional)
 
-## การติดตั้งและใช้งาน (Installation)
+## 🏗️ System Architecture
 
-### ความต้องการระบบ
-- Node.js 18+
-- npm หรือ yarn
-- React Native development environment
-- PostgreSQL 14+
-- Redis 6+
+### ภาพรวมสถาปัตยกรรม (Architecture Overview)
 
-### ขั้นตอนการติดตั้ง
+```mermaid
+graph TB
+    subgraph "Mobile App Layer"
+        Mobile[📱 React Native App<br/>TypeScript]
+        Redux[Redux Store]
+        UI[React Native Paper UI]
 
-```bash
-# Clone repository
-git clone https://github.com/Nontawatt/knowcall.git
-cd knowcall
+        Mobile --> Redux
+        Mobile --> UI
+    end
 
-# Install dependencies
-npm install
+    subgraph "API Layer"
+        API[🔌 REST API<br/>Express.js]
+        Auth[Authentication]
+        RateLimit[Rate Limiter]
 
-# Setup environment variables
-cp .env.example .env
+        API --> Auth
+        API --> RateLimit
+    end
 
-# Run database migrations
-npm run migrate
+    subgraph "Business Logic Layer"
+        Controller[Controllers]
+        Service[Services]
+        Verification[📞 Number Verification<br/>Service]
 
-# Start development server
-npm run dev
+        Controller --> Service
+        Service --> Verification
+    end
+
+    subgraph "Data Layer"
+        Cache[(🗄️ Redis<br/>Cache)]
+        DB[(🗄️ PostgreSQL<br/>Database)]
+    end
+
+    subgraph "External Services"
+        UnknownPhone[UnknownPhone API]
+        Tellows[Tellows API]
+        TrueCaller[TrueCaller API]
+    end
+
+    Mobile -->|HTTPS/REST| API
+    Controller --> Cache
+    Controller --> DB
+    Verification --> Cache
+    Verification --> UnknownPhone
+    Verification --> Tellows
+    Verification --> TrueCaller
+
+    style Mobile fill:#4CAF50
+    style API fill:#2196F3
+    style DB fill:#FF9800
+    style Cache fill:#F44336
+    style Verification fill:#9C27B0
 ```
 
-## โครงสร้างโปรเจค (Project Structure)
+### การไหลของข้อมูล (Data Flow)
 
+```mermaid
+sequenceDiagram
+    actor User
+    participant App as 📱 Mobile App
+    participant API as 🔌 Backend API
+    participant Cache as Redis Cache
+    participant DB as PostgreSQL
+    participant Ext as External APIs
+
+    User->>App: ตรวจสอบหมายเลข
+    App->>API: POST /api/phones/verify
+
+    API->>Cache: ตรวจสอบ Cache
+
+    alt Cache Hit
+        Cache-->>API: ส่งข้อมูลจาก Cache
+    else Cache Miss
+        API->>DB: ค้นหาในฐานข้อมูล
+        API->>Ext: ตรวจสอบจาก External APIs
+        Ext-->>API: ผลการตรวจสอบ
+        API->>Cache: บันทึก Cache
+        API->>DB: บันทึกผลลัพธ์
+    end
+
+    API-->>App: ส่งผลการตรวจสอบ
+    App-->>User: แสดงผล Risk Level
 ```
-knowcall/
-├── mobile/          # React Native mobile app
-├── backend/         # Node.js backend API
-├── shared/          # Shared types and utilities
-├── docs/            # Documentation
-└── README.md
-```
+
 ### โครงสร้างระบบ (System Components)
 
 ```mermaid
@@ -164,9 +225,127 @@ flowchart TD
 ```
 
 📖 **รายละเอียดเพิ่มเติม**: ดู [Architecture Guide](docs/ARCHITECTURE.md)
-## การพัฒนา (Development)
+
+## การติดตั้งและใช้งาน (Installation)
+
+### ความต้องการระบบ
+- Node.js 18+
+- npm หรือ yarn
+- React Native development environment
+- PostgreSQL 14+
+- Redis 6+
+
+### ขั้นตอนการติดตั้ง
+
+```bash
+# Clone repository
+git clone https://github.com/Nontawatt/knowcall.git
+cd knowcall
+
+# Install dependencies
+npm install
+
+# Setup environment variables
+cp .env.example .env
+
+# Run database migrations
+npm run migrate
+
+# Start development server
+npm run dev
+```
+
+## โครงสร้างโปรเจค (Project Structure)
+
+```
+knowcall/
+├── mobile/          # React Native mobile app
+├── backend/         # Node.js backend API
+├── shared/          # Shared types and utilities
+├── docs/            # Documentation
+└── README.md
+```
+
+## 🚀 เริ่มต้นอย่างรวดเร็ว
+
+```bash
+# Clone repository
+git clone https://github.com/Nontawatt/knowcall.git
+cd knowcall
+
+# Install dependencies
+npm install
+
+# Setup environment
+cp .env.example .env
+
+# Run backend
+cd backend && npm run dev
+
+# Run mobile (in new terminal)
+cd mobile && npm start
+```
+
+📖 **อ่านเพิ่มเติม**: [Setup Guide](docs/SETUP.md)
+
+## 📱 Features
+
+- ✅ ตรวจสอบหมายเลขโทรศัพท์
+- ✅ บล็อกสายอัตโนมัติ
+- ✅ จัดการ Whitelist/Blacklist
+- ✅ Auto-Mute สำหรับสแปม
+- ✅ รายงานหมายเลขที่น่าสงสัย
+- ✅ ดูประวัติการโทร
+- ✅ การแจ้งเตือนแบบ real-time
+
+## 🎯 สำหรับผู้ใช้
+
+1. **ติดตั้งแอป** - ดาวน์โหลดจาก App Store หรือ Google Play
+2. **ตั้งค่า** - ปรับแต่งการบล็อกตามต้องการ
+3. **เริ่มใช้งาน** - ปล่อยให้แอปป้องกันให้คุณ
+
+📖 **คู่มือ**: [Getting Started Guide](docs/wiki/Getting-Started.md)
+
+## 👨‍💻 สำหรับนักพัฒนา
+
+1. **อ่าน Architecture** - [ARCHITECTURE.md](docs/ARCHITECTURE.md)
+2. **ดู API Docs** - [API.md](docs/API.md)
+3. **ติดตั้ง Development Environment** - [SETUP.md](docs/SETUP.md)
+4. **อ่าน Contributing Guidelines** - [CONTRIBUTING.md](CONTRIBUTING.md)
+
+## 🛡️ ความปลอดภัย
+
+- 🔒 ไม่เก็บรายชื่อผู้ติดต่อ
+- 🔒 ไม่แชร์ข้อมูลส่วนตัว
+- 🔒 เข้ารหัสข้อมูลทั้งหมด
+- 🔒 Open Source และตรวจสอบได้
+
+📖 **เพิ่มเติม**: [Safety Tips](docs/wiki/Safety-Tips.md)
+
+## 📊 สถานะการพัฒนา
 
 โปรเจคนี้อยู่ในระหว่างการพัฒนา (Prototype Stage)
+
+**ที่ทำเสร็จแล้ว:**
+- ✅ Mobile App UI (4 screens)
+- ✅ Backend API (15+ endpoints)
+- ✅ Database Schema
+- ✅ Number Verification
+- ✅ Call Blocking Logic
+- ✅ Whitelist/Blacklist Management
+- ✅ Documentation
+
+**กำลังพัฒนา:**
+- 🔄 Real-time notifications
+- 🔄 Machine Learning integration
+- 🔄 External API integrations
+- 🔄 Testing suite
+
+**แผนในอนาคต:**
+- 📋 iOS app release
+- 📋 Android app release
+- 📋 Integration กับธนาคาร
+- 📋 Community features
 
 ## การมีส่วนร่วม (Contributing)
 
@@ -174,7 +353,7 @@ flowchart TD
 
 ## ใบอนุญาต (License)
 
-SRAN License - ดูรายละเอียดใน [LICENSE](LICENSE)
+MIT License - ดูรายละเอียดใน [LICENSE](LICENSE)
 
 ## ติดต่อ (Contact)
 
