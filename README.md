@@ -110,9 +110,9 @@ graph TB
     Controller --> DB
     Verification --> Cache
     Verification --> UnknownPhone
-    Verification --> Tellows
+    Verification --> Tellows / SRAN
     Verification --> TrueCaller
-    design by SRAN
+    
 
     style Mobile fill:#4CAF50
     style API fill:#2196F3
