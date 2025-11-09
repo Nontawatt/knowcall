@@ -174,7 +174,7 @@ flowchart TD
 
 ## ใบอนุญาต (License)
 
-MIT License - ดูรายละเอียดใน [LICENSE](LICENSE)
+SRAN License - ดูรายละเอียดใน [LICENSE](LICENSE)
 
 ## ติดต่อ (Contact)
 
